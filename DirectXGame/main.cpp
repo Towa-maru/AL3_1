@@ -9,10 +9,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
+	KamataEngine::Initialize(L"GC1C_05_タシロ_トワ");
+
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize();
-
-	KamataEngine::Initialize(L"GC1C_05_タシロ_トワ");
 
 	while(true) {
 		if (KamataEngine::Update()) {
