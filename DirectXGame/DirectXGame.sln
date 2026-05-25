@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32210.238
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11806.211 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXGame", "DirectXGame.vcxproj", "{21B76583-DB5E-4750-B00C-FBCF46ABCE48}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{08917CEF-EBAE-40D1-8875-7ED65489951A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
