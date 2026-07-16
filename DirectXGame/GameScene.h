@@ -1,5 +1,6 @@
 #pragma once
 #include "KamataEngine.h"
+#include "MapChipField.h"
 #include "Player.h"
 #include "Skydome.h"
 #include <vector>
@@ -9,6 +10,8 @@ class GameScene {
 public:
 	// 初期化
 	void Initialize();
+
+	void GenerateBlocks();
 
 	// 更新
 	void Update();
@@ -30,6 +33,8 @@ private:
 	KamataEngine::Model* modelBlock_ = nullptr;
 
 	KamataEngine::Model* modelSkydome_ = nullptr;
+
+	MapChipField* mapChipField_;
 
 	// カメラ
 	KamataEngine::Camera camera_;
