@@ -265,7 +265,8 @@
     <None Include="Resources\shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GaneScene.h" />
+    <ClInclude Include="GameScene.h" />
+    <ClInclude Include="MathUtility.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
