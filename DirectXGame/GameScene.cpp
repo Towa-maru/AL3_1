@@ -12,10 +12,10 @@ void GameScene::Initialize() {
 	camera_.Initialize();
 
 	// ファイル名を指定してテクスチャを読み込む
-	textureHandle_ = TextureManager::Load("uvChecker.png");
+	textureHandle_ = TextureManager::Load("player/player.png");
 
 	// 3Dモデルの生成
-	model_ = Model::Create();
+	model_ = Model::CreateFromOBJ("player", true);
 
 	modelBlock_ = Model::Create();
 
@@ -29,8 +29,10 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(1, 18);
+
 	// 自キャラの初期化
-	player_->Initialize(model_, textureHandle_, &camera_);
+	player_->Initialize(model_, &camera_, playerPosition, textureHandle_);
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
