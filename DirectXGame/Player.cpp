@@ -16,6 +16,7 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position, u
 	textureHandle_ = textureHandle;
 
 	worldTransform_.Initialize();
+	worldTransform_.scale_ = {2.0f, 2.0f, 2.0f};
 	worldTransform_.translation_ = position;
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 

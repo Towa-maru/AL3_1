@@ -34,6 +34,13 @@ void GameScene::Initialize() {
 	// 自キャラの初期化
 	player_->Initialize(model_, &camera_, playerPosition, textureHandle_);
 
+	cameraController_ = new CameraController();
+	cameraController_->Initialize();
+	cameraController_->SetTarget(player_);
+	cameraController_->Reset();
+
+	cameraController_->SetMovableArea({0, 100, 0, 100});
+
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
 
@@ -75,6 +82,7 @@ GameScene::~GameScene() {
 	delete skydome_;
 	delete modelSkydome_;
 	delete mapChipField_;
+	delete cameraController_;
 
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
@@ -102,6 +110,8 @@ void GameScene::Update() {
 		}
 	}
 
+	cameraController_->Update();
+
 #ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
@@ -110,14 +120,14 @@ void GameScene::Update() {
 
 	// カメラの処理
 	if (isDebugCameraActive_) {
-		// デバッグカメラの更新
 		camera_.matView = debugCamera_->GetCamera().matView;
 		camera_.matProjection = debugCamera_->GetCamera().matProjection;
-		// ビュープロジェクション行列の転送
 		camera_.TransferMatrix();
 	} else {
-		// ビュープロジェクション行列の更新と転送
-		camera_.UpdateMatrix();
+		// カメラコントローラのカメラを使う
+		camera_.matView = cameraController_->GetCamera().matView;
+		camera_.matProjection = cameraController_->GetCamera().matProjection;
+		camera_.TransferMatrix();
 	}
 }
 

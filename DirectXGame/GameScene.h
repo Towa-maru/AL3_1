@@ -1,4 +1,5 @@
 #pragma once
+#include "CameraController.h"
 #include "KamataEngine.h"
 #include "MapChipField.h"
 #include "Player.h"
@@ -43,6 +44,8 @@ private:
 	Player* player_ = nullptr;
 
 	Skydome* skydome_ = nullptr;
+
+	CameraController* cameraController_ = nullptr;
 
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;

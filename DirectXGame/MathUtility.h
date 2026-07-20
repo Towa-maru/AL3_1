@@ -32,3 +32,5 @@ inline Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 transla
 
 	return matrix;
 }
+
+inline float Lerp(float a, float b, float t) { return a + (b - a) * t; }
