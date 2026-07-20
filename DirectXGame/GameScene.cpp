@@ -43,6 +43,12 @@ void GameScene::Initialize() {
 
 	player_->setMapChipField(mapchipField_);
 
+	// 仮の生成処理。後で消す。
+	textureHandleParticle_ = TextureManager::Load("./Resources/deathParticle/white1x1.png");
+	deathParticleModel_ = Model::CreateFromOBJ("deathParticle", true);
+	deathParticles_ = new DeathParticles;
+	deathParticles_->Initialize(deathParticleModel_, textureHandleParticle_, &camera_, player_->GetWorldPosition());
+
 	textureHandleEnemy_ = TextureManager::Load("./Resources/enemy/enemy.png");
 
 	enemyModel_ = Model::CreateFromOBJ("enemy", true);
@@ -85,6 +91,9 @@ void GameScene::Initialize() {
 // =========================
 void GameScene::Update() {
 	player_->Update();
+	if (deathParticles_) {
+		deathParticles_->Update();
+	}
 	for (Enemy* enemy : enemies_) {
 		enemy->update();
 	}
@@ -143,6 +152,9 @@ void GameScene::Draw() {
 
 	skydome_->Draw(camera_);
 	player_->Draw();
+	if (deathParticles_) {
+		deathParticles_->Draw();
+	}
 	for (Enemy* enemy : enemies_) {
 		enemy->draw();
 	}
@@ -214,6 +226,8 @@ GameScene::~GameScene() {
 	delete model_;
 	delete debugCamera_;
 	delete player_;
+	delete deathParticles_;
+	delete deathParticleModel_;
 	delete skydome_;
 	for (Enemy* enemy : enemies_) {
 		delete enemy;

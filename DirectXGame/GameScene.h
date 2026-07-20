@@ -1,11 +1,13 @@
 #pragma once
 #include "CameraController.h"
+#include "DeathParticles.h"
 #include "Enemy.h"
 #include "MapChipField.h"
 #include "Player.h"
 #include "skydome.h"
 #include <KamataEngine.h>
 #include <vector>
+
 class GameScene {
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 	std::list<Enemy*> enemies_;
@@ -31,6 +33,9 @@ private:
 	KamataEngine::Model* blockModel_ = nullptr;
 	KamataEngine::Model* model_ = nullptr;
 	Model* enemyModel_ = nullptr;
+	Model* deathParticleModel_ = nullptr;
+	uint32_t textureHandleParticle_ = 0;
+	DeathParticles* deathParticles_ = nullptr;
 	CameraController* cameraController_ = nullptr;
 	KamataEngine::WorldTransform worldTransform_;
 	KamataEngine::Camera camera_;
