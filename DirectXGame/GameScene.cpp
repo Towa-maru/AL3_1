@@ -1,10 +1,16 @@
 #include "GameScene.h"
 #include "MathUtility.h"
 #include "Player.h"
+#include "WorldTransformUpdate.h"
 
 using namespace KamataEngine;
 
 void GameScene::Initialize() {
+
+	// カメラの初期化
+	camera_.farZ = 5000.0f;
+	camera_.Initialize();
+
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("uvChecker.png");
 
@@ -13,8 +19,7 @@ void GameScene::Initialize() {
 
 	modelBlock_ = Model::Create();
 
-	// カメラの初期化
-	camera_.Initialize();
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	// 自キャラの生成
 	player_ = new Player();
@@ -24,6 +29,9 @@ void GameScene::Initialize() {
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
+
+	skydome_ = new Skydome();
+	skydome_->Initialize(modelSkydome_);
 
 	// 要素数
 	const uint32_t kNumBlockVertical = 10;
@@ -59,6 +67,8 @@ GameScene::~GameScene() {
 	delete model_;
 	delete modelBlock_;
 	delete debugCamera_;
+	delete skydome_;
+	delete modelSkydome_;
 
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
@@ -75,13 +85,14 @@ void GameScene::Update() {
 	// デバッグカメラの更新
 	debugCamera_->Update();
 
+	skydome_->Update();
+
 	// ブロックの更新
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock)
 				continue;
-			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
-			worldTransformBlock->TransferMatrix();
+			UpdateWorldTransform(*worldTransformBlock);
 		}
 	}
 
@@ -108,6 +119,8 @@ void GameScene::Draw() {
 	Model::PreDraw();
 
 	player_->Draw();
+
+	skydome_->Draw(camera_);
 
 	// ブロックの描画
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
