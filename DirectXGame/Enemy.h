@@ -1,33 +1,65 @@
 #pragma once
 #include "KamataEngine.h"
-#include <numbers>
-
+#include "MapChipField.h"
 using namespace KamataEngine;
-
+class Player;
 class Enemy {
 public:
-	void Initialize(Model* model, Camera* camera, const Vector3& position);
-	void Update();
-	void Draw();
+	float walkTimer_ = 0.0f;
+	static inline const float kWalkAnimationPeriod = 1.0f; // seconds per cycle
+	static inline const float kMaxRockAngle = 15.0f;       // degrees of rock
+
+	Enemy();
+	struct AABB {
+		Vector3 min;
+		Vector3 max;
+	};
+
+	AABB GetAABB();
+	Vector3 GetWorldPosition();
+
+	void Initialize(KamataEngine::Model* model, uint32_t textureHandleEnemy, KamataEngine::Camera* camera, Vector3& position);
+	void update();
+	void draw();
+	void setMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
+	void onCollision(const Player* player);
 
 private:
+	// Collision corners
+	enum Corner { kRightBottom, kLeftBottom, kRightTop, kLeftTop, kNumCorner };
+
+	struct CollisionMapInfo {
+		bool isHitDown = false;
+		bool isHitUp = false;
+		bool isHitLeft = false;
+		bool isHitRight = false;
+		Vector3 velocityAfterCollision = {};
+	};
+
+	Vector3 CornerPosition(const Vector3& center, Corner corner);
+	void CollisionMap(CollisionMapInfo& info);
+	void CollisionMapTop(CollisionMapInfo& info);
+	void CollisionMapBottom(CollisionMapInfo& info);
+	void CollisionMapRight(CollisionMapInfo& info);
+	void CollisionMapLeft(CollisionMapInfo& info);
+	void CollisionDetected(const CollisionMapInfo& info);
+	void ApplyCollisionResult(const CollisionMapInfo& info);
+
+	MapChipField* mapChipField_ = nullptr;
 	WorldTransform worldTransform_;
-	Model* model_ = nullptr;
+	Model* enemyModel_ = nullptr;
+	uint32_t textureHandleEnemy_ = 0;
 	Camera* camera_ = nullptr;
 
-	// 歩行の速さ
-	static inline const float kWalkSpeed = 0.05f;
+	Vector3 velocity_ = {0.0f, 0.0f, 0.0f};
+	bool onGround_ = false;
 
-	// 速度
-	Vector3 velocity_ = {};
-
-	// 最初の角度[度]
-	static inline const float kWalkMotionAngleStart = -30.0f;
-	// 最後の角度[度]
-	static inline const float kWalkMotionAngleEnd = 30.0f;
-	// アニメーションの周期となる時間[秒]
-	static inline const float kWalkMotionTime = 1.0f;
-
-	// 経過時間
-	float walkTimer_ = 0.0f;
+	static inline const float kGravityAcceleration = 0.05f;
+	static inline const float kLimitFallSpeed = 0.5f;
+	static inline const float kWidth = 1.0f;
+	static inline const float kHeight = 1.0f;
+	static inline const float kWalkSpeed = 0.02f;
+	static inline const float kWalkMotionAngleStart = 1.0f;
+	static inline const float kWalkMotionAngleEnd = 2.0f;
+	static inline const float kWalkMotionTime = 0.5f;
 };
