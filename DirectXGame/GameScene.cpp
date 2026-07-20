@@ -9,50 +9,28 @@
 
 using namespace KamataEngine;
 
-// =========================
-// Initialize
-// =========================
 void GameScene::Initialize() {
-
 	textureHandle_ = TextureManager::Load("./Resources/block/block.png");
-
 	blockModel_ = Model::CreateFromOBJ("block", true);
-
 	camera_.Initialize();
-
 	debugCamera_ = new DebugCamera(1280, 720);
-
-	// debug camera activation flag
 	isDebugCameraActive_ = false;
 
-	// MAP FIRST
 	mapchipField_ = new MapChipField();
-
 	mapchipField_->LoadMapChipCsv("Resources/blocks.csv");
 
-	// PLAYER
 	player_ = new Player();
-
 	textureHandlePlayer_ = TextureManager::Load("./Resources/player/player.png");
-
 	model_ = Model::CreateFromOBJ("player", true);
-
 	Vector3 playerPosition = mapchipField_->GetmapChipPositionByIndex(1, 17);
-
 	player_->Initialize(model_, textureHandlePlayer_, &camera_, playerPosition);
-
 	player_->setMapChipField(mapchipField_);
 
-	// 仮の生成処理。後で消す。
 	textureHandleParticle_ = TextureManager::Load("./Resources/deathParticle/white1x1.png");
 	deathParticleModel_ = Model::CreateFromOBJ("deathParticle", true);
-	deathParticles_ = new DeathParticles;
-	deathParticles_->Initialize(deathParticleModel_, textureHandleParticle_, &camera_, player_->GetWorldPosition());
 
 	textureHandleEnemy_ = TextureManager::Load("./Resources/enemy/enemy.png");
-
 	enemyModel_ = Model::CreateFromOBJ("enemy", true);
-
 	for (int32_t i = 0; i < 3; i++) {
 		Enemy* newEnemy = new Enemy();
 		Vector3 enemysPosition = mapchipField_->GetmapChipPositionByIndex(10 + i * 5, 17);
@@ -61,39 +39,24 @@ void GameScene::Initialize() {
 		enemies_.push_back(newEnemy);
 	}
 
-	// CAMERA CONTROLLER
 	cameraController_ = new CameraController();
-
 	cameraController_->Initialize(&camera_, player_);
-
-	CameraController::Rect movableArea = {
-	    0.0f,   // left
-	    100.0f, // top
-	    100.0f, // right
-	    0.0f    // bottom
-	};
-
+	CameraController::Rect movableArea = {0.0f, 100.0f, 100.0f, 0.0f};
 	cameraController_->SetMovableArea(movableArea);
-	// SKYDOME
-	skydome_ = new skydome();
 
+	skydome_ = new skydome();
 	skydome_->initialize();
 
 	camera_.farZ = 1000.0f;
-
 	camera_.UpdateMatrix();
 
 	GenerateBlocks();
+
+	phase_ = Phase::kPlay;
 }
 
-// =========================
-// Update
-// =========================
-void GameScene::Update() {
+void GameScene::UpdateGamePlay() {
 	player_->Update();
-	if (deathParticles_) {
-		deathParticles_->Update();
-	}
 	for (Enemy* enemy : enemies_) {
 		enemy->update();
 	}
@@ -102,63 +65,101 @@ void GameScene::Update() {
 	CheckAllCollisions();
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
-			if (!worldTransformBlock) {
+			if (!worldTransformBlock)
 				continue;
-			}
-			// Scale
 			worldTransformBlock->scale_ = {1.0f, 1.0f, 1.0f};
-
-			// Rotation
 			worldTransformBlock->rotation_.y = 0.00f;
-
-			// World Matrix
 			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
-
-			// Transfer
 			worldTransformBlock->TransferMatrix();
 		}
 	}
 
-#ifdef DEBUG
+	/// 自キャラがデス状態なら
+	if (player_->IsDead()) {
+		/// 死亡演出フェーズに切り替え
+		phase_ = Phase::kDeath;
+		/// 自キャラの座標を取得
+		const Vector3& deathParticlesPosition = player_->GetWorldPosition();
+		/// 自キャラの座標にデスパーティクルを発生、初期化
+		deathParticles_ = new DeathParticles();
+		deathParticles_->Initialize(deathParticleModel_, textureHandleParticle_, &camera_, deathParticlesPosition);
+	}
+}
 
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-
-		if (isDebugCameraActive_) {
-			isDebugCameraActive_ = !isDebugCameraActive_;
-		} else {
-			isDebugCameraActive_ = true;
+void GameScene::UpdateDeath() {
+	if (deathParticles_) {
+		deathParticles_->Update();
+	}
+	for (Enemy* enemy : enemies_) {
+		enemy->update();
+	}
+	skydome_->update();
+	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+			if (!worldTransformBlock)
+				continue;
+			worldTransformBlock->scale_ = {1.0f, 1.0f, 1.0f};
+			worldTransformBlock->rotation_.y = 0.00f;
+			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+			worldTransformBlock->TransferMatrix();
 		}
 	}
+	if (deathParticles_ && deathParticles_->IsFinished()) {
+		finished_ = true;
+	}
+}
 
+void GameScene::ChangePhase() {
+	switch (phase_) {
+	case Phase::kPlay:
+		/// ゲームプレイフェーズの処理
+		break;
+	case Phase::kDeath:
+		/// デス演出フェーズの処理
+		break;
+	}
+}
+
+void GameScene::Update() {
+	switch (phase_) {
+	case Phase::kPlay:
+		UpdateGamePlay();
+		break;
+	case Phase::kDeath:
+		UpdateDeath();
+		break;
+	}
+
+#ifdef DEBUG
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
+	}
 #endif
 	debugCamera_->Update();
 	if (isDebugCameraActive_) {
-
 		camera_.matView = debugCamera_->GetCamera().matView;
-
 		camera_.matProjection = debugCamera_->GetCamera().matProjection;
 		camera_.TransferMatrix();
 	} else {
-
 		camera_.UpdateMatrix();
 	}
 }
 
-// =========================
-// Draw
-// =========================
 void GameScene::Draw() {
 	Model::PreDraw();
 
 	skydome_->Draw(camera_);
-	player_->Draw();
+
+	if (phase_ == Phase::kPlay) {
+		player_->Draw();
+	}
+
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
 	for (Enemy* enemy : enemies_) {
 		enemy->draw();
 	}
-
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock)

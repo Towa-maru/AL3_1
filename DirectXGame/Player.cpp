@@ -144,6 +144,8 @@ void Player::onCollision(const Enemy* enemy) {
 	(void)enemy;
 
 	velocity_.y += kJumpAcceleration;
+
+	isDead_ = true;
 }
 
 void Player::CollisionMapTop(CollisionMapInfo& info) {

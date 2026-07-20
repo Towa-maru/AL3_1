@@ -75,6 +75,10 @@ public:
 
 	Vector3 CornerPosition(const Vector3& center, Corner corner);
 
+	bool isDead_ = false;
+
+	bool IsDead() const { return isDead_; }
+
 	~Player();
 
 private:

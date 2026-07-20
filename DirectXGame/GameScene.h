@@ -13,6 +13,13 @@ class GameScene {
 	std::list<Enemy*> enemies_;
 	bool isDebugCameraActive_ = false;
 
+	enum class Phase {
+		kPlay,
+		kDeath,
+	};
+
+	Phase phase_;
+
 public:
 	void Initialize();
 
@@ -25,7 +32,14 @@ public:
 	void CheckAllCollisions();
 	~GameScene();
 
+	bool finished_ = false;
+	bool IsFinished() const { return finished_; }
+
 private:
+	void UpdateGamePlay();
+	void UpdateDeath();
+	void ChangePhase();
+
 	uint32_t textureHandle_ = 0;
 	uint32_t textureHandlePlayer_ = 0;
 	uint32_t textureHandleEnemy_ = 0;
