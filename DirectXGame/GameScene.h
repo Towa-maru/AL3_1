@@ -1,64 +1,59 @@
 #pragma once
 #include "CameraController.h"
-#include "DeathParticles.h"
 #include "Enemy.h"
-#include "Fade.h"
+#include "KamataEngine.h"
 #include "MapChipField.h"
 #include "Player.h"
-#include "skydome.h"
-#include <KamataEngine.h>
+#include "Skydome.h"
 #include <vector>
 
+// ゲームシーン
 class GameScene {
-	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
-	std::list<Enemy*> enemies_;
-	bool isDebugCameraActive_ = false;
-
-	enum class Phase {
-		kFadeIn,  /// フェードイン
-		kPlay,    /// ゲームプレイ
-		kDeath,   /// デス演出
-		kFadeOut, /// フェードアウト
-	};
-
-	Phase phase_ = Phase::kFadeIn;
-
 public:
+	// 初期化
 	void Initialize();
-
-	void Update();
-
-	void Draw();
 
 	void GenerateBlocks();
 
-	void CheckAllCollisions();
+	// 更新
+	void Update();
+
+	// 描画
+	void Draw();
+
 	~GameScene();
 
-	bool finished_ = false;
-	bool IsFinished() const { return finished_; }
+	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
 private:
-	void UpdateGamePlay();
-	void UpdateDeath();
-	void ChangePhase();
-
+	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
-	uint32_t textureHandlePlayer_ = 0;
-	uint32_t textureHandleEnemy_ = 0;
-	MapChipField* mapchipField_;
-	KamataEngine::Model* blockModel_ = nullptr;
-	KamataEngine::Model* model_ = nullptr;
-	Model* enemyModel_ = nullptr;
-	Model* deathParticleModel_ = nullptr;
-	uint32_t textureHandleParticle_ = 0;
-	DeathParticles* deathParticles_ = nullptr;
-	CameraController* cameraController_ = nullptr;
-	KamataEngine::WorldTransform worldTransform_;
-	KamataEngine::Camera camera_;
-	KamataEngine::DebugCamera* debugCamera_ = nullptr;
 
-	skydome* skydome_ = nullptr;
+	// 3Dモデルデータ
+	KamataEngine::Model* model_ = nullptr;
+
+	KamataEngine::Model* modelBlock_ = nullptr;
+
+	KamataEngine::Model* modelSkydome_ = nullptr;
+
+	MapChipField* mapChipField_;
+
+	// カメラ
+	KamataEngine::Camera camera_;
+
+	// 自キャラ
 	Player* player_ = nullptr;
-	Fade* fade_ = nullptr;
+
+	Skydome* skydome_ = nullptr;
+
+	Model* modelEnemy_ = nullptr;
+	Enemy* enemy_ = nullptr;
+
+	CameraController* cameraController_ = nullptr;
+
+	// デバッグカメラ有効
+	bool isDebugCameraActive_ = false;
+
+	// デバッグカメラ
+	KamataEngine::DebugCamera* debugCamera_ = nullptr;
 };

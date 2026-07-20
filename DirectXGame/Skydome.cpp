@@ -1,20 +1,17 @@
-#include "skydome.h"
+#include "Skydome.h"
 
 using namespace KamataEngine;
 
-void skydome::initialize() {
-
-	textureHandleSky_ = TextureManager::Load("./Resources/SkyDome/sky_sphere.png");
-
-	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
-
+void Skydome::Initialize(KamataEngine::Model* model) {
+	model_ = model;
 	worldTransform_.Initialize();
 
-	worldTransform_.scale_ = {-100.0f, 100.0f, 100.0f};
+	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 }
 
-void skydome::update() { worldTransform_.TransferMatrix(); }
+void Skydome::Update() {}
 
-void skydome::Draw(Camera& camera) { modelSkydome_->Draw(worldTransform_, camera, textureHandleSky_); }
-
-skydome::~skydome() { delete modelSkydome_; }
+void Skydome::Draw(KamataEngine::Camera& camera) {
+	// 3Dモデルの描画
+	model_->Draw(worldTransform_, camera);
+}
