@@ -1,55 +1,64 @@
 #pragma once
 #include "CameraController.h"
-#include "KamataEngine.h"
+#include "DeathParticles.h"
+#include "Enemy.h"
+#include "Fade.h"
 #include "MapChipField.h"
 #include "Player.h"
-#include "Skydome.h"
+#include "skydome.h"
+#include <KamataEngine.h>
 #include <vector>
 
-// ゲームシーン
 class GameScene {
+	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
+	std::list<Enemy*> enemies_;
+	bool isDebugCameraActive_ = false;
+
+	enum class Phase {
+		kFadeIn,  /// フェードイン
+		kPlay,    /// ゲームプレイ
+		kDeath,   /// デス演出
+		kFadeOut, /// フェードアウト
+	};
+
+	Phase phase_ = Phase::kFadeIn;
+
 public:
-	// 初期化
 	void Initialize();
+
+	void Update();
+
+	void Draw();
 
 	void GenerateBlocks();
 
-	// 更新
-	void Update();
-
-	// 描画
-	void Draw();
-
+	void CheckAllCollisions();
 	~GameScene();
 
-	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
+	bool finished_ = false;
+	bool IsFinished() const { return finished_; }
 
 private:
-	// テクスチャハンドル
+	void UpdateGamePlay();
+	void UpdateDeath();
+	void ChangePhase();
+
 	uint32_t textureHandle_ = 0;
-
-	// 3Dモデルデータ
+	uint32_t textureHandlePlayer_ = 0;
+	uint32_t textureHandleEnemy_ = 0;
+	MapChipField* mapchipField_;
+	KamataEngine::Model* blockModel_ = nullptr;
 	KamataEngine::Model* model_ = nullptr;
-
-	KamataEngine::Model* modelBlock_ = nullptr;
-
-	KamataEngine::Model* modelSkydome_ = nullptr;
-
-	MapChipField* mapChipField_;
-
-	// カメラ
-	KamataEngine::Camera camera_;
-
-	// 自キャラ
-	Player* player_ = nullptr;
-
-	Skydome* skydome_ = nullptr;
-
+	Model* enemyModel_ = nullptr;
+	Model* deathParticleModel_ = nullptr;
+	uint32_t textureHandleParticle_ = 0;
+	DeathParticles* deathParticles_ = nullptr;
 	CameraController* cameraController_ = nullptr;
-
-	// デバッグカメラ有効
-	bool isDebugCameraActive_ = false;
-
-	// デバッグカメラ
+	KamataEngine::WorldTransform worldTransform_;
+	KamataEngine::Camera camera_;
 	KamataEngine::DebugCamera* debugCamera_ = nullptr;
+
+	skydome* skydome_ = nullptr;
+	Player* player_ = nullptr;
+	Fade* fade_ = nullptr;
 };
