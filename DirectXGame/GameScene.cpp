@@ -34,6 +34,8 @@ void GameScene::Initialize() {
 	// 自キャラの初期化
 	player_->Initialize(model_, &camera_, playerPosition, textureHandle_);
 
+	player_->SetMapChipField(mapChipField_);
+
 	cameraController_ = new CameraController();
 	cameraController_->Initialize();
 	cameraController_->SetTarget(player_);
