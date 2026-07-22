@@ -179,11 +179,17 @@ void Player::CollisionMapTop(CollisionMapInfo& info) {
 
 	if (hit) {
 		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kLeftTop]);
-		MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
 
-		worldTransform_.translation_.y = rect.bottom - kHeight / 2.0f;
-		info.velocityAfterCollision.y = 0.0f;
-		info.isHitUp = true;
+		// セル境界の判定：移動前のセルと衝突検出したセルのyIndexを比較
+		IndexSet indexSetNow = mapChipField_->GetMapChipIndexSetByPosition(worldTransform_.translation_);
+
+		if (indexSetNow.yIndex != indexSet.yIndex) {
+			MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
+
+			worldTransform_.translation_.y = rect.bottom - kHeight / 2.0f;
+			info.velocityAfterCollision.y = 0.0f;
+			info.isHitUp = true;
+		}
 	}
 }
 
@@ -220,13 +226,18 @@ void Player::CollisionMapBottom(CollisionMapInfo& info) {
 
 	if (hit) {
 
-		MapChipField::Rect rect = mapChipField_->GetRectByIndex(hitIndex.xIndex, hitIndex.yIndex);
+		// セル境界の判定：移動前のセルと着地検出したセルのyIndexを比較
+		IndexSet indexSetNow = mapChipField_->GetMapChipIndexSetByPosition(worldTransform_.translation_);
 
-		float correctY = rect.top + kHeight / 2.0f;
+		if (indexSetNow.yIndex != hitIndex.yIndex) {
+			MapChipField::Rect rect = mapChipField_->GetRectByIndex(hitIndex.xIndex, hitIndex.yIndex);
 
-		info.velocityAfterCollision.y = correctY - worldTransform_.translation_.y;
+			float correctY = rect.top + kHeight / 2.0f;
 
-		info.isHitDown = true;
+			info.velocityAfterCollision.y = correctY - worldTransform_.translation_.y;
+
+			info.isHitDown = true;
+		}
 	}
 }
 void Player::CollisionMapRight(CollisionMapInfo& info) {
@@ -260,12 +271,18 @@ void Player::CollisionMapRight(CollisionMapInfo& info) {
 
 	if (hit) {
 		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kRightTop]);
-		MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
 
-		// push player to LEFT of the tile
-		worldTransform_.translation_.x = rect.left - kWidth / 2.0f;
-		info.velocityAfterCollision.x = 0.0f;
-		info.isHitRight = true;
+		// セル境界の判定：移動前のセルと衝突検出したセルのxIndexを比較
+		IndexSet indexSetNow = mapChipField_->GetMapChipIndexSetByPosition(worldTransform_.translation_);
+
+		if (indexSetNow.xIndex != indexSet.xIndex) {
+			MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
+
+			// push player to LEFT of the tile
+			worldTransform_.translation_.x = rect.left - kWidth / 2.0f;
+			info.velocityAfterCollision.x = 0.0f;
+			info.isHitRight = true;
+		}
 	}
 }
 
@@ -316,13 +333,18 @@ void Player::CollisionMapleft(CollisionMapInfo& info) {
 			indexSet = indexSetBottom;
 		}
 
-		MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
+		// セル境界の判定：移動前のセルと衝突検出したセルのxIndexを比較
+		IndexSet indexSetNow = mapChipField_->GetMapChipIndexSetByPosition(worldTransform_.translation_);
 
-		// push player to right side of block
-		worldTransform_.translation_.x = rect.right + kWidth / 2.0f - 0.001f;
+		if (indexSetNow.xIndex != indexSet.xIndex) {
+			MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
 
-		info.velocityAfterCollision.x = 0.0f;
-		info.isHitLeft = true;
+			// push player to right side of block
+			worldTransform_.translation_.x = rect.right + kWidth / 2.0f - 0.001f;
+
+			info.velocityAfterCollision.x = 0.0f;
+			info.isHitLeft = true;
+		}
 	}
 }
 
