@@ -59,7 +59,7 @@ public:
 
 	const WorldTransform& GetWorldTransform() const;
 	const Vector3& GetVelocity() const { return velocity_; }
-	void CollisionDeceted(const CollisionMapInfo& info);
+	void CollisionDetected(const CollisionMapInfo& info);
 	void TopCollision(const CollisionMapInfo& info);
 	void Initialize(KamataEngine::Model* model, uint32_t textureHandlePlayer, KamataEngine::Camera* camera, Vector3& position);
 
@@ -85,7 +85,7 @@ private:
 	void CollisionMapTop(CollisionMapInfo& info);
 	void CollisionMapBottom(CollisionMapInfo& info);
 	void CollisionMapRight(CollisionMapInfo& info);
-	void CollisionMapleft(CollisionMapInfo& info);
+	void CollisionMapLeft(CollisionMapInfo& info);
 	MapChipField* mapChipField_ = nullptr;
 
 	WorldTransform worldTransform_;

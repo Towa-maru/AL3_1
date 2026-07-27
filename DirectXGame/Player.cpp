@@ -101,7 +101,7 @@ void Player::Update() {
 	CollisionMap(collisionmapInfo);
 
 	// apply position
-	CollisionDeceted(collisionmapInfo);
+	CollisionDetected(collisionmapInfo);
 
 	// apply velocity changes from collision
 	TopCollision(collisionmapInfo);
@@ -136,7 +136,7 @@ void Player::CollisionMap(CollisionMapInfo& info) {
 	CollisionMapTop(info);    // 上
 	CollisionMapBottom(info); // 下
 	CollisionMapRight(info);  // 右
-	CollisionMapleft(info);   // 左
+	CollisionMapLeft(info);   // 左
 }
 
 void Player::onCollision(const Enemy* enemy) {
@@ -286,7 +286,7 @@ void Player::CollisionMapRight(CollisionMapInfo& info) {
 	}
 }
 
-void Player::CollisionMapleft(CollisionMapInfo& info) {
+void Player::CollisionMapLeft(CollisionMapInfo& info) {
 
 	std::array<Vector3, kNumCorner> positionNew;
 
@@ -365,7 +365,7 @@ Vector3 Player::CornerPosition(const Vector3& center, Corner corner) {
 
 	return {center.x + offset.x, center.y + offset.y, center.z + offset.z};
 }
-void Player::CollisionDeceted(const CollisionMapInfo& info) {
+void Player::CollisionDetected(const CollisionMapInfo& info) {
 	// only apply if not already snapped by collision
 	if (!info.isHitDown && !info.isHitUp) {
 		worldTransform_.translation_.y += info.velocityAfterCollision.y;
